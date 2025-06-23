@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "express": "^5.1.0",
+    "openai": "^4.0.0"
+  }
+
+
+}

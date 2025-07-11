@@ -1,9 +1,11 @@
 {
   "type": "module",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.56.0",
+    "dotenv": "^17.0.0",
     "express": "^5.1.0",
-    "openai": "^4.0.0"
+    "json5": "^2.2.3",
+    "mathjs": "^14.5.2",
+    "openai": "^5.8.3"
   }
-
-
 }

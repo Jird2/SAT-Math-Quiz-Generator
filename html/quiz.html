@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAT Math Quiz Generator</title>
+    <link rel="stylesheet" href="/public/css/style.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Left Content Area -->
+        <div class="content-area">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="/public/assets/foleyprep.png" alt="Quiz Platform Logo" class="quiz-logo">
+                </div>
+                <h1>SAT Math Quiz Generator</h1>
+                <p class="subtitle">Professional-grade practice questions designed to help students excel on the SAT Math section</p>
+            </div>
+
+            <!-- Quiz Generator Form -->
+            <div class="card modern-card" id="generatorCard">
+                <div class="modern-card-header">
+                    <div class="form-card-icon">📝</div>
+                    <div>
+                        <div class="form-card-title">Create Your Quiz</div>
+                        <div class="form-card-subtitle">Customize your SAT Math practice session</div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-section">
+                        <div class="form-grid modern-form-grid">
+                            <div class="form-group modern-form-group">
+                                <label class="modern-form-label">
+                                    <div class="label-icon">📚</div>
+                                    Math Classes Taken
+                                </label>
+                                <div class="custom-dropdown" id="mathClassesDropdown">
+                                    <div class="dropdown-selected" id="dropdownSelected">
+                                        <span>Select Math Classes</span>
+                                        <div class="select-arrow">▼</div>
+                                    </div>
+                                    <div class="dropdown-list" id="dropdownList">
+                                        <div class="dropdown-option" data-value="Algebra I">Algebra I</div>
+                                        <div class="dropdown-option" data-value="Geometry">Geometry</div>
+                                        <div class="dropdown-option" data-value="Algebra II">Algebra II</div>
+                                        <div class="dropdown-option" data-value="Trigonometry">Trigonometry</div>
+                                        <div class="dropdown-option" data-value="Pre-Calculus">Pre-Calculus</div>
+                                    </div>
+                                </div>
+                                <div class="selected-classes" id="selectedClassesTags"></div>
+                            </div>
+
+                            <div class="form-group modern-form-group">
+                                <label class="modern-form-label">
+                                    <div class="label-icon">📊</div>
+                                    Number of Questions
+                                </label>
+                                <div class="range-container">
+                                    <div class="range-wrapper">
+                                        <input type="range" id="numQuestions" class="range-input" min="1" max="10" value="5">
+                                    </div>
+                                    <div class="range-display" id="questionCount">5 Questions</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group modern-form-group">
+                            <label class="modern-form-label">
+                                <div class="label-icon">❓</div>
+                                Difficulty Level
+                            </label>
+                            <div class="difficulty-options modern-difficulty-grid">
+                                <div class="difficulty-option difficulty-easy">
+                                    <input type="radio" id="easy" name="difficulty" value="easy">
+                                    <label for="easy">Easy</label>
+                                </div>
+                                <div class="difficulty-option difficulty-medium">
+                                    <input type="radio" id="medium" name="difficulty" value="medium" checked>
+                                    <label for="medium">Medium</label>
+                                </div>
+                                <div class="difficulty-option difficulty-hard">
+                                    <input type="radio" id="hard" name="difficulty" value="hard">
+                                    <label for="hard">Hard</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="generate-btn modern-submit-btn" id="generateBtn">
+                        Generate Quiz!
+                    </button>
+
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <span>Generating your personalized quiz...</span>
+                    </div>
+
+                    <div class="error-message" id="errorMessage"></div>
+                    <div class="warning-message" id="warningMessage"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Container -->
+            <div class="card" id="quizCard">
+                <div class="quiz-container" id="quizContainer">
+                    <div class="card-header">
+                        <h2>SAT Math Practice Quiz</h2>
+                        <div class="quiz-info" id="quizInfo">
+                            <!-- Quiz info will be populated here -->
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="quizForm">
+                            <div id="questionsContainer">
+                                <!-- Questions will be populated here -->
+                            </div>
+                            
+                            <button type="submit" class="submit-quiz-btn">
+                                Submit Quiz for Grading
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Container -->
+            <div class="card" id="resultsCard">
+            </div>
+        </div>
+        <div class="mascot-area">
+            <div class="mascot-container">
+                <div class="mascot-speech" id="mascotSpeech">
+                    Ready to ace your SAT Math? Let's get started!
+                </div>
+                <img src="/public/assets/Brainy.svg" alt="Quiz Mascot" class="mascot-image">
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/js/quiz.js"></script>
+</body>
+</html>

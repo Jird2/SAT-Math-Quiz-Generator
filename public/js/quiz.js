@@ -1,11 +1,33 @@
-// @ts-ignore
+/**
+ * @typedef {Object} Quiz
+ * @property {string[]} selectedClasses
+ * @property {string} difficulty
+ * @property {QuizQuestion[]} questions
+ */
+
+/**
+ * @typedef {Object} QuizQuestion
+ * @property {number} id
+ * @property {string} question
+ * @property {Object.<string, string>} options
+ * @property {string} correctAnswer
+ * @property {string} explanation
+ */
+
+/**
+ * @type {Quiz | null}
+ */
 let currentQuiz = null;
-// @ts-ignore
+/**
+ * @type {string[]}
+ */
 let selectedMathClasses = [];
 const idlePhrases = ["Ready to ace your SAT Math? Let's get started!", "Math is like a puzzle, let's solve it together!", "Practice makes perfect! You've got this!", "Don't give up!", "Let's turn those math challenges into victories!", "Let's be better than yesterday!"];
 
 let currentPhraseIndex = 0;
-// @ts-ignore
+/**
+ * @type {string | number | NodeJS.Timeout | undefined}
+ */
 let phraseInterval;
 let isUserAction = false;
 
@@ -21,7 +43,10 @@ function startPhraseRotation() {
 }
 
 function stopPhraseRotation() {
-    // @ts-ignore
+    /**
+     * @param {number} phraseInterval
+     * @returns {number | undefined}
+     */
     if (phraseInterval) {
         clearInterval(phraseInterval);
     }
@@ -50,11 +75,9 @@ function updateMascotMessage(message, isAction = false) {
 function initializeModernDropdown() {
     const dropdownSelected = document.getElementById("dropdownSelected");
     const dropdownList = document.getElementById("dropdownList");
-    const selectedTags = document.getElementById("selectedClassesTags");
+    // const selectedTags = document.getElementById("selectedClassesTags");
 
     if (!dropdownSelected || !dropdownList) return;
-
-    // Toggle dropdown
     dropdownSelected.addEventListener("click", () => {
         dropdownList.classList.toggle("open");
         dropdownSelected.classList.toggle("active");
@@ -64,10 +87,9 @@ function initializeModernDropdown() {
         }
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener("click", (e) => {
-        //@ts-ignore
-        if (!document.getElementById("mathClassesDropdown").contains(e.target)) {
+        const mathClassesDropdown = document.getElementById("mathClassesDropdown");
+        if (!mathClassesDropdown || !e.target || !(e.target instanceof Node) || !mathClassesDropdown.contains(e.target)) {
             dropdownList.classList.remove("open");
             dropdownSelected.classList.remove("active");
             const arrow = dropdownSelected.querySelector(".select-arrow");
@@ -80,20 +102,18 @@ function initializeModernDropdown() {
     // Handle option selection
     document.querySelectorAll(".dropdown-option").forEach((option) => {
         option.addEventListener("click", (e) => {
-            //@ts-ignore
+            if (!e.target || !(e.target instanceof HTMLElement)) return;
             const value = e.target.dataset.value;
-            //@ts-ignore
+
+            if (!value) return;
+
             if (selectedMathClasses.includes(value)) {
-                // Remove from selection
-                //@ts-ignore
                 selectedMathClasses = selectedMathClasses.filter((cls) => cls !== value);
                 option.classList.remove("selected");
             } else {
-                // Add to selection
                 selectedMathClasses.push(value);
                 option.classList.add("selected");
             }
-            //@ts-ignore
             updateModernSelectedDisplay();
         });
     });
@@ -107,12 +127,10 @@ function updateModernSelectedDisplay() {
     const placeholder = dropdownSelected.querySelector("span");
     if (!placeholder) return;
 
-    // Update selected text
     if (selectedMathClasses.length === 0) {
         placeholder.textContent = "Select Math Classes";
         placeholder.classList.remove("has-selections");
     } else if (selectedMathClasses.length === 1) {
-        // @ts-ignore
         placeholder.textContent = selectedMathClasses[0];
         placeholder.classList.add("has-selections");
     } else if (selectedMathClasses.length === 5) {
@@ -123,7 +141,6 @@ function updateModernSelectedDisplay() {
         placeholder.classList.add("has-selections");
     }
 
-    // Update tags
     if (selectedTags) {
         // @ts-ignore
         selectedTags.innerHTML = selectedMathClasses
@@ -138,9 +155,10 @@ function updateModernSelectedDisplay() {
     }
 }
 
-//@ts-ignore
+/**
+ * @param {string} className
+ */
 function removeModernTag(className) {
-    //@ts-ignore
     selectedMathClasses = selectedMathClasses.filter((cls) => cls !== className);
     const option = document.querySelector(`[data-value="${className}"]`);
     if (option) {
@@ -149,15 +167,12 @@ function removeModernTag(className) {
     updateModernSelectedDisplay();
 }
 
-// Make function globally accessible
 window.removeModernTag = removeModernTag;
 
 // Demo shortcut - Press Ctrl + . to jump to results page
 document.addEventListener("keydown", function (e) {
     if (e.ctrlKey && e.key === ".") {
         e.preventDefault();
-
-        // Mock quiz data
         currentQuiz = {
             selectedClasses: ["Algebra II", "Trigonometry"],
             difficulty: "medium",
@@ -201,7 +216,7 @@ document.addEventListener("keydown", function (e) {
             ],
         };
 
-        // Mock results with some correct and incorrect answers
+        // Mock results with some correct and incorrect answers (Demo purposes)
         const mockResults = {
             score: 2,
             total: 3,
@@ -230,8 +245,6 @@ document.addEventListener("keydown", function (e) {
                 },
             ],
         };
-
-        // Hide generator, show results (no mascot message)
         const generatorCard = document.getElementById("generatorCard");
         if (generatorCard instanceof HTMLElement) {
             generatorCard.style.display = "none";
@@ -242,7 +255,6 @@ document.addEventListener("keydown", function (e) {
     }
 });
 
-// Select All / Clear All button functions
 function selectAllClasses() {
     const checkboxes = document.querySelectorAll('.multi-select-option input[type="checkbox"]');
     checkboxes.forEach(
@@ -267,7 +279,6 @@ function clearAllClasses() {
     updateSelectedClasses();
 }
 
-// Multi-select dropdown functionality
 const mathClassesHeader = document.getElementById("mathClassesHeader");
 if (mathClassesHeader instanceof HTMLElement) {
     mathClassesHeader.addEventListener("click", function () {
@@ -284,7 +295,6 @@ if (mathClassesHeader instanceof HTMLElement) {
     });
 }
 
-// Handle checkbox changes (including Select All)
 document.querySelectorAll('.multi-select-option input[type="checkbox"]').forEach(
     /** @param {Element} checkbox */ (checkbox) => {
         if (checkbox instanceof HTMLInputElement) {
@@ -360,7 +370,6 @@ function updateClassesDisplay() {
         placeholder.textContent = "Select Math Classes";
         placeholder.classList.remove("has-selections");
     } else if (selectedMathClasses.length === 1) {
-        // @ts-ignore
         placeholder.textContent = selectedMathClasses[0];
         placeholder.classList.add("has-selections");
     } else if (selectedMathClasses.length === 5) {
@@ -375,7 +384,6 @@ function updateClassesDisplay() {
 function updateClassesTags() {
     const container = document.getElementById("selectedClassesTags");
     if (!container) return;
-    // @ts-ignore
     container.innerHTML = selectedMathClasses
         .map(
             /** @param {string} cls */ (cls) =>
@@ -426,10 +434,9 @@ document.addEventListener("click", function (event) {
 const numQuestionsInput = document.getElementById("numQuestions");
 if (numQuestionsInput instanceof HTMLInputElement) {
     numQuestionsInput.addEventListener("input", function () {
-        const count = this.value;
+        const count = parseInt(this.value);
         const questionCount = document.getElementById("questionCount");
         if (questionCount) {
-            // @ts-ignore
             questionCount.textContent = `${count} Question${count != 1 ? "s" : ""}`;
         }
     });
@@ -487,7 +494,6 @@ if (generateBtn instanceof HTMLButtonElement) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    // @ts-ignore
                     selectedClasses: selectedMathClasses,
                     numquestions: numQuestions,
                     difficulty: difficulty,
@@ -506,8 +512,6 @@ if (generateBtn instanceof HTMLButtonElement) {
             if (data.quiz.questions.length < numQuestions) {
                 showWarning(`Generated ${data.quiz.questions.length} questions instead of ${numQuestions} due to quality validation.`);
             }
-
-            // Store quiz data and display it
             currentQuiz = data.quiz;
             displayQuiz(currentQuiz);
         } catch (error) {
@@ -515,7 +519,6 @@ if (generateBtn instanceof HTMLButtonElement) {
             showError("Failed to generate quiz. Please try again.");
             updateMascotMessage("Oops! Something went wrong. Let's try again!", true);
         } finally {
-            // Reset button state
             btn.disabled = false;
             btn.textContent = "Generate Quiz!";
             if (loading instanceof HTMLElement) loading.style.display = "none";
@@ -592,13 +595,11 @@ function displayQuiz(quiz) {
     if (quizContainer instanceof HTMLElement) quizContainer.style.display = "block";
 }
 
-// Submit Quiz Function
 const quizForm = document.getElementById("quizForm");
 if (quizForm instanceof HTMLFormElement) {
     quizForm.addEventListener("submit", async function (e) {
         e.preventDefault();
-
-        // @ts-ignore
+        //@ts-ignore
         if (!currentQuiz) {
             alert("No quiz to submit");
             return;
@@ -654,13 +655,11 @@ if (quizForm instanceof HTMLFormElement) {
  */
 function displayResults(results) {
     const mascotArea = document.querySelector(".mascot-area");
-    if (mascotArea) {
-        // @ts-ignore
+    if (mascotArea instanceof HTMLElement) {
         mascotArea.style.display = "none";
     }
     const contentArea = document.querySelector(".content-area");
-    if (contentArea) {
-        // @ts-ignore
+    if (contentArea instanceof HTMLElement) {
         contentArea.style.flex = "1";
     }
     const percentage = results.percentage;
@@ -674,13 +673,11 @@ function displayResults(results) {
     const resultsContent = results.results
         .map(
             /** @param {any} result @param {number} index */ (result, index) => {
-                // @ts-ignore
+                if (!currentQuiz) return "";
                 const question = currentQuiz.questions[index];
                 const isCorrect = result.correct;
                 const statusClass = isCorrect ? "correct" : "incorrect";
-                const statusIcon = isCorrect ? "✓" : "✗";
-
-                // Only show correct answer separately if student was wrong
+                const statusIcon = isCorrect ? "✅" : "❌";
                 const showCorrectAnswer = !isCorrect;
 
                 return `
@@ -756,8 +753,6 @@ function displayResults(results) {
             }
         )
         .join("");
-
-    // Update the results card HTML structure with background wrapper
     const resultsCard = document.getElementById("resultsCard");
     if (resultsCard) {
         resultsCard.innerHTML = `
@@ -790,9 +785,6 @@ function displayResults(results) {
                             <button class="action-btn btn-secondary" id="backBtn">
                                 ← Generate New Quiz
                             </button>
-                            <button class="action-btn btn-primary" id="generateAnotherBtn">
-                                🔄 Same Settings Quiz
-                            </button>
                         </div>
                         
                         <div id="resultsContainer">
@@ -808,15 +800,13 @@ function displayResults(results) {
         if (backBtn) {
             backBtn.addEventListener("click", function () {
                 const mascotArea = document.querySelector(".mascot-area");
-                if (mascotArea) {
-                    // @ts-ignore
+                if (mascotArea instanceof HTMLElement) {
                     mascotArea.style.display = "flex";
                 }
 
                 // Restore content area width
                 const contentArea = document.querySelector(".content-area");
-                if (contentArea) {
-                    // @ts-ignore
+                if (contentArea instanceof HTMLElement) {
                     contentArea.style.flex = "2";
                 }
                 const resultsCard = document.getElementById("resultsCard");
@@ -892,42 +882,7 @@ function displayResults(results) {
                 }, 100);
             });
         }
-
-        const generateAnotherBtn = document.getElementById("generateAnotherBtn");
-        if (generateAnotherBtn) {
-            generateAnotherBtn.addEventListener("click", function () {
-                updateMascotMessage("Generating more questions with the same settings!", true);
-
-                const resultsCard = document.getElementById("resultsCard");
-                const generatorCard = document.getElementById("generatorCard");
-
-                if (resultsCard) resultsCard.style.display = "none";
-                if (generatorCard) generatorCard.style.display = "block";
-
-                const mascotArea = document.querySelector(".mascot-area");
-
-                if (mascotArea) {
-                    // @ts-ignore
-                    mascotArea.style.display = "flex";
-                }
-
-                const contentArea = document.querySelector(".content-area");
-                if (contentArea) {
-                    // @ts-ignore
-                    contentArea.style.flex = "2";
-                }
-
-                currentQuiz = null;
-                setTimeout(() => {
-                    const generateBtn = document.getElementById("generateBtn");
-                    if (generateBtn instanceof HTMLButtonElement) {
-                        generateBtn.click();
-                    }
-                }, 100);
-            });
-        }
     }
-
     // Show results, hide quiz
     const quizCard = document.getElementById("quizCard");
     const resultsCardFinal = document.getElementById("resultsCard");
@@ -937,7 +892,10 @@ function displayResults(results) {
     if (resultsCardFinal) resultsCardFinal.style.display = "block";
     if (resultsFinal) resultsFinal.style.display = "block";
 }
-// @ts-ignore
+/**
+ *
+ * @param {string} message
+ */
 function showError(message) {
     const errorMessage = document.getElementById("errorMessage");
     const warningMessage = document.getElementById("warningMessage");

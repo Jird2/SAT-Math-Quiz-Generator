@@ -3,14 +3,15 @@ import fs from "fs";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import { generateQuiz, gradeQuiz } from "./quizgeneratorai.js";
+import { generateQuiz, gradeQuiz, formatQuizMath } from "./quizgeneratorai.js";
 const app = express();
 const port = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
-app.use(express.json()); //to parse Json request bodies
+app.use(express.json()); // Parse JSON request bodies
 app.use("/public", express.static(path.join(__dirname, "public")));
+
 app.get("/", (_req, res) => {
     res.json({ message: "Quiz server is running!" });
 });
@@ -24,7 +25,8 @@ app.post("/generateQuiz", async (req, res) => {
     const { selectedClasses, numquestions, difficulty } = req.body;
     try {
         const quiz = await generateQuiz(selectedClasses, numquestions, difficulty);
-        res.json(quiz);
+        const formattedQuiz = formatQuizMath(quiz);
+        res.json(formattedQuiz);
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         res.status(400).json({ error: errorMessage });

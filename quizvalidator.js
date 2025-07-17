@@ -12,43 +12,43 @@ import * as math from "mathjs";
 
 /**
  * @typedef {Object} Question
- * @property {number} [id] - Question ID
- * @property {string} question - The question text
- * @property {QuestionOptions} options - The answer options
- * @property {string} correctAnswer - The correct answer key (A, B, C, or D)
- * @property {string} explanation - Explanation of the answer
+ * @property {number} [id]
+ * @property {string} question
+ * @property {QuestionOptions} options
+ * @property {string} correctAnswer
+ * @property {string} explanation
  */
 
 /**
  * @typedef {Object} ValidationResult
- * @property {boolean} isValid - Whether the question is valid
- * @property {string[]} issues - Array of validation issues found
- * @property {number} score - Quality score (0-100)
- * @property {string|null} correctedAnswer - The actually correct answer if different
- * @property {SolutionResult|null} solution - Independent solution details
+ * @property {boolean} isValid
+ * @property {string[]} issues
+ * @property {number} score
+ * @property {string|null} correctedAnswer
+ * @property {SolutionResult|null} solution
  */
 
 /**
  * @typedef {Object} SolutionResult
- * @property {boolean} solved - Whether the solution was found
- * @property {string|number|null} answer - The calculated answer
- * @property {string} method - The method used to solve
- * @property {string} [expression] - The mathematical expression
- * @property {string} [equation] - The equation being solved
- * @property {string} [calculation] - The calculation steps
+ * @property {boolean} solved
+ * @property {string|number|null} answer
+ * @property {string} method
+ * @property {string} [expression]
+ * @property {string} [equation]
+ * @property {string} [calculation]
  */
 
 /**
  * @typedef {Object} MatchingOption
- * @property {string} option - The option key (A, B, C, or D)
- * @property {number} confidence - Confidence level (0-1)
+ * @property {string} option - (A, B, C, or D)
+ * @property {number} confidence - (0-1)
  */
 
 /**
  * @typedef {Object} BasicValidation
- * @property {boolean} isValid - Whether validation passed
- * @property {string[]} issues - Array of issues found
- * @property {number} score - Quality score
+ * @property {boolean} isValid
+ * @property {string[]} issues
+ * @property {number} score
  */
 
 /**
@@ -58,8 +58,8 @@ export class MathQuestionValidator {
     // PUBLIC API METHODS
     /**
      * Main validation function - intelligent validation based on question complexity
-     * @param {Question} question - The question object to validate
-     * @returns {ValidationResult} Validation result with correction if needed
+     * @param {Question} question
+     * @returns {ValidationResult}
      */
     static validateQuestion(question) {
         /** @type {string[]} */
@@ -117,10 +117,10 @@ export class MathQuestionValidator {
 
     /**
      * Generate a corrected explanation when we auto-correct an answer
-     * @param {Question} question - The original question
-     * @param {SolutionResult} solution - Our independent solution
-     * @param {string} correctedAnswer - The corrected answer key
-     * @returns {string} Corrected explanation
+     * @param {Question} question
+     * @param {SolutionResult} solution
+     * @param {string} correctedAnswer
+     * @returns {string} - Corrected explanation
      */
     static generateCorrectedExplanation(question, solution, correctedAnswer) {
         const questionText = question.question.toLowerCase();
@@ -157,7 +157,7 @@ export class MathQuestionValidator {
 
     /**
      * Determine if a question is simple enough for math validation
-     * @param {string} questionText - The question text to analyze
+     * @param {string} questionText
      * @returns {boolean} True if it's a simple question
      */
     static isSimpleQuestion(questionText) {
@@ -209,8 +209,8 @@ export class MathQuestionValidator {
 
     /**
      * Validate simple questions with mathematical solving
-     * @param {Question} question - The question to validate
-     * @returns {ValidationResult} Validation result
+     * @param {Question} question
+     * @returns {ValidationResult}
      */
     static validateSimpleQuestion(question) {
         /** @type {string[]} */
@@ -252,8 +252,8 @@ export class MathQuestionValidator {
 
     /**
      * Validate complex questions with quality checks only
-     * @param {Question} question - The question to validate
-     * @returns {ValidationResult} Validation result
+     * @param {Question} question
+     * @returns {ValidationResult}
      */
     static validateComplexQuestion(question) {
         /** @type {string[]} */
@@ -278,8 +278,8 @@ export class MathQuestionValidator {
 
     /**
      * Basic structural validation
-     * @param {Question} question - The question to validate
-     * @returns {BasicValidation} Validation result
+     * @param {Question} question
+     * @returns {BasicValidation}
      */
     static validateStructure(question) {
         /** @type {string[]} */
@@ -317,8 +317,8 @@ export class MathQuestionValidator {
 
     /**
      * Basic quality validation for complex questions
-     * @param {Question} question - The question to validate
-     * @returns {BasicValidation} Validation result
+     * @param {Question} question
+     * @returns {BasicValidation}
      */
     static validateBasicQuality(question) {
         /** @type {string[]} */
@@ -355,8 +355,8 @@ export class MathQuestionValidator {
 
     /**
      * Basic math validation when independent solving fails
-     * @param {Question} question - The question to validate
-     * @returns {BasicValidation} Validation result
+     * @param {Question} question
+     * @returns {BasicValidation}
      */
     static validateBasicMath(question) {
         /** @type {string[]} */
@@ -365,13 +365,12 @@ export class MathQuestionValidator {
 
         return { isValid: issues.length === 0, issues, score };
     }
-
     // QUESTION SOLVING METHOD
 
     /**
      * Attempt to solve the math question independently (for simple questions)
-     * @param {Question} question - The question to solve
-     * @returns {SolutionResult} Solution result
+     * @param {Question} question
+     * @returns {SolutionResult}
      */
     static solveQuestion(question) {
         const questionText = question.question.toLowerCase();
@@ -397,8 +396,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve simple arithmetic expressions
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveArithmetic(questionText) {
         /** @type {RegExp[]} */
@@ -430,8 +429,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve linear equations
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveLinearEquation(questionText) {
         /** @type {RegExp[]} */
@@ -472,8 +471,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve geometry problems
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveGeometry(questionText) {
         const numbers = questionText.match(/(\d+(?:\.\d+)?)/g)?.map((n) => parseFloat(n)) || [];
@@ -526,8 +525,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve percentage problems
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solvePercentage(questionText) {
         const percentOfMatch = questionText.match(/what\s+is\s+(\d+(?:\.\d+)?)\s*%\s+of\s+(\d+(?:\.\d+)?)/i);
@@ -549,8 +548,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve function evaluation
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveFunction(questionText) {
         const funcMatch = questionText.match(/f\(x\)\s*=\s*([^,]+).*f\((\d+)\)/i);
@@ -580,8 +579,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve slope and y-intercept problems
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveSlopeIntercept(questionText) {
         const equationMatch = questionText.match(/([+-]?\d*)\s*x\s*([+-]\s*\d*)\s*y\s*=\s*([+-]?\d+)/i);
@@ -620,8 +619,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve quadratic factoring and roots problems
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveQuadratic(questionText) {
         const quadraticMatch = questionText.match(/([+-]?\d*)\s*x\s*(?:\^2|²)\s*([+-]\s*\d*)\s*x\s*([+-]\s*\d+)\s*=\s*0/i);
@@ -657,7 +656,7 @@ export class MathQuestionValidator {
                                 const testProduct = root1 * root2;
 
                                 if (testSum === sum && testProduct === product) {
-                                    console.log(`✅ Found quadratic roots: ${root1} and ${root2}`);
+                                    console.log(`Found quadratic roots: ${root1} and ${root2}`);
                                     return {
                                         solved: true,
                                         answer: root1 < root2 ? `${root1} and ${root2}` : `${root2} and ${root1}`,
@@ -679,8 +678,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve polynomial degree questions
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solvePolynomialDegree(questionText) {
         const polyMatches = questionText.match(/([+-]?\d*)\s*x\s*(?:\^(\d+)|³|²)/gi);
@@ -722,8 +721,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve rational expression simplification
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveRationalExpression(questionText) {
         const rationalMatch = questionText.match(/\(([^)]+)\)\s*\/\s*\(([^)]+)\)/);
@@ -747,8 +746,8 @@ export class MathQuestionValidator {
 
     /**
      * Solve coefficient questions
-     * @param {string} questionText - The question text to analyze
-     * @returns {SolutionResult} Solution result
+     * @param {string} questionText
+     * @returns {SolutionResult}
      */
     static solveCoefficientQuestion(questionText) {
         if (!questionText.includes("coefficient")) {
@@ -793,7 +792,7 @@ export class MathQuestionValidator {
 
     /**
      * Normalize answer for comparison - handles fractions, decimals, and expressions
-     * @param {string|number} value - The value to normalize
+     * @param {string|number} value
      * @returns {string} Normalized value
      */
     static normalizeAnswer(value) {
@@ -821,9 +820,9 @@ export class MathQuestionValidator {
 
     /**
      * Find which answer option matches our calculated result
-     * @param {string|number|null} calculatedAnswer - The calculated answer
-     * @param {QuestionOptions} options - The answer options
-     * @returns {MatchingOption|null} Matching option or null
+     * @param {string|number|null} calculatedAnswer
+     * @param {QuestionOptions} options
+     * @returns {MatchingOption|null}
      */
     static findMatchingOption(calculatedAnswer, options) {
         if (calculatedAnswer === null) return null;
@@ -877,8 +876,8 @@ export class MathQuestionValidator {
 
     /**
      * Format answer consistently
-     * @param {number} num - The number to format
-     * @returns {string} Formatted answer
+     * @param {number} num
+     * @returns {string}
      */
     static formatAnswer(num) {
         if (typeof num !== "number") return String(num);
@@ -891,10 +890,10 @@ export class MathQuestionValidator {
     // HELPER METHODS
     /**
      * Fix original explanation with corrected answer
-     * @param {Question} question - The original question
-     * @param {string} questionText - Lowercase question text
-     * @param {string} correctOption - The correct option text
-     * @returns {string} Fixed explanation
+     * @param {Question} question
+     * @param {string} questionText
+     * @param {string} correctOption
+     * @returns {string}
      * @private
      */
     static _fixOriginalExplanation(question, questionText, correctOption) {

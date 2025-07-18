@@ -75,7 +75,7 @@ function updateMascotMessage(message, isAction = false) {
 function initializeModernDropdown() {
     const dropdownSelected = document.getElementById("dropdownSelected");
     const dropdownList = document.getElementById("dropdownList");
-    // const selectedTags = document.getElementById("selectedClassesTags");
+    const selectedTags = document.getElementById("selectedClassesTags");
 
     if (!dropdownSelected || !dropdownList) return;
     dropdownSelected.addEventListener("click", () => {

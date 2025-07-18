@@ -3,21 +3,23 @@ import fs from "fs";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import { generateQuiz, gradeQuiz, formatQuizMath } from "./quizgeneratorai.js";
+import { generateQuiz } from "./quizgeneratorai.js";
+import { gradeQuiz } from "./quizGrader.js";
+import { formatQuizMath } from "./mathFormatting.js";
 const app = express();
 const port = 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
 app.use(express.json()); // Parse JSON request bodies
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
 app.get("/", (_req, res) => {
     res.json({ message: "Quiz server is running!" });
 });
 
 app.get("/quiz", (_req, res) => {
-    const html = fs.readFileSync(path.join(__dirname, "html", "quiz.html"), "utf8");
+    const html = fs.readFileSync(path.join(__dirname, "..", "public", "html", "quiz.html"), "utf8");
     res.send(html);
 });
 

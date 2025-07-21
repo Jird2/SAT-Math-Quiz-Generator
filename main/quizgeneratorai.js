@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 // Internal modules
 import { MathQuestionValidator } from "./quizvalidator.js";
 import { parseJSONWithFallbacks } from "./jsonProcessor.js";
-import { formatQuestionMath } from "./mathFormatting.js";
+import { formatWithKaTeX } from "./mathFormatting.js";
 import { cleanExplanation } from "./explanationCleaner.js";
 // Config + util
 import { mathClasses, isValidMathClasses, isValidDifficulty, isValidNumQuestions } from "../config/generationconstants.js";
@@ -56,13 +56,15 @@ export async function generateQuiz(selectedClasses = [], numquestions = 0, diffi
         for (let attempt = 1; attempt <= maxAttempts && validQuestions.length < numquestions; attempt++) {
             console.log(`Attempt ${attempt}/${maxAttempts}...`);
 
-            const questionsToGenerate = Math.min(10, (numquestions - validQuestions.length) * 2);
+            const questionsToGenerate = Math.min(5, (numquestions - validQuestions.length) * 2);
             const dynamicPrompt = buildDynamicPrompt(validatedClasses, difficulty, questionsToGenerate);
             const systemPrompt = createSystemPrompt(difficulty);
+            console.log("System prompt length:", systemPrompt.length);
+            console.log("Cached rules length:", CACHED_FORMATTING_RULES.length);
             //region API Prompt Caching
             const response = await anthropic.messages.create({
                 model: "claude-opus-4-20250514",
-                max_tokens: 7000,
+                max_tokens: 12500,
                 temperature: 0.4,
                 stream: true,
                 stop_sequences: [],
@@ -115,6 +117,9 @@ export async function generateQuiz(selectedClasses = [], numquestions = 0, diffi
             console.log("Response preview:", content.substring(0, 200));
             console.log("Response ending:", content.substring(Math.max(0, content.length - 200)));
 
+            if (content.length > 12000) {
+                console.warn("Response unusually long, token count will be high.");
+            }
             // Parse and validate questions
             const data = parseJSONWithFallbacks(content);
 
@@ -177,7 +182,7 @@ function processValidQuestion(question, validation, questionId) {
             topic: question.topic,
         };
 
-        const formattedQuestion = formatQuestionMath(correctedQuestion);
+        const formattedQuestion = formatWithKaTeX(correctedQuestion);
 
         return {
             question: formattedQuestion,
@@ -201,7 +206,7 @@ function processValidQuestion(question, validation, questionId) {
             topic: question.topic,
         };
 
-        const formattedQuestion = formatQuestionMath(perfectQuestion);
+        const formattedQuestion = formatWithKaTeX(perfectQuestion);
 
         return {
             question: formattedQuestion,
@@ -247,5 +252,5 @@ function formatFinalResult(validQuestions, correctedQuestions, numquestions, sel
         },
     };
 }
-export { formatQuizMath } from "./mathFormatting.js";
+export { formatWithKaTeX } from "./mathFormatting.js";
 export { gradeQuiz } from "./quizGrader.js";

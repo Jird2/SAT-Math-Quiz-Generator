@@ -5,9 +5,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { generateQuiz } from "./quizgeneratorai.js";
 import { gradeQuiz } from "./quizGrader.js";
-import { formatQuizMath } from "./mathFormatting.js";
+import { formatWithKaTeX } from "./mathFormatting.js";
 const app = express();
-const port = 3000;
+const port = 3000; // Pull this into the .env instead of hardcoding
+// Edgecases for port resolution
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
@@ -27,7 +28,7 @@ app.post("/generateQuiz", async (req, res) => {
     const { selectedClasses, numquestions, difficulty } = req.body;
     try {
         const quiz = await generateQuiz(selectedClasses, numquestions, difficulty);
-        const formattedQuiz = formatQuizMath(quiz);
+        const formattedQuiz = formatWithKaTeX(quiz);
         res.json(formattedQuiz);
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);

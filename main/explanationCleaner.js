@@ -41,7 +41,7 @@ export function cleanExplanation(explanation) {
         }
         cleanSentences.push(sentence);
     }
-
+    
     const result = cleanSentences.join(". ").trim();
     return result.length > 10 ? result + (result.endsWith(".") ? "" : ".") : cleaned;
 }

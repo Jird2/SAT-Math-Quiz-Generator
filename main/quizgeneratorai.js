@@ -64,10 +64,10 @@ export async function generateQuiz(selectedClasses = [], numquestions = 0, diffi
             //region API Prompt Caching
             const response = await anthropic.messages.create({
                 model: "claude-opus-4-20250514",
-                max_tokens: 12500,
+                max_tokens: 8000,
                 temperature: 0.4,
                 stream: true,
-                stop_sequences: [],
+                stop_sequences: ["}]}}"],
                 messages: [
                     {
                         role: "user",
@@ -84,7 +84,7 @@ export async function generateQuiz(selectedClasses = [], numquestions = 0, diffi
                             },
                             {
                                 type: "text",
-                                text: CACHED_FORMATTING_RULES,
+                                text: CACHED_FORMATTING_RULES + "\n\n IMPORTANT: Keep explanations concise (2-3 sentences max). Do not show excessive step-by-step calculations. Focus on the key insight and final answer",
                                 cache_control: { type: "ephemeral" },
                             },
                             {
@@ -97,7 +97,7 @@ export async function generateQuiz(selectedClasses = [], numquestions = 0, diffi
                 system: [
                     {
                         type: "text",
-                        text: systemPrompt,
+                        text: systemPrompt + "\n\nCRITICAL: Keep all explanations brief and concise. Limit each explanation to 2-3 sentences maximum. Do not include lengthy calculations or step-by-step work.",
                         cache_control: { type: "ephemeral" },
                     },
                 ],

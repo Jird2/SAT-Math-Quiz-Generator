@@ -31,6 +31,45 @@ let currentPhraseIndex = 0;
 let phraseInterval;
 let isUserAction = false;
 
+function loadKaTeX() {
+    return new Promise((resolve, reject) => {
+        // Load main KaTeX script
+        const katexScript = document.createElement("script");
+        katexScript.src = "/public/katex/katex.min.js";
+        katexScript.onload = () => {
+            // Load auto-render extension
+            const autoRenderScript = document.createElement("script");
+            autoRenderScript.src = "/public/katex/contrib/auto-render.min.js";
+            autoRenderScript.onload = () => resolve(undefined);
+            autoRenderScript.onerror = () => reject();
+            document.head.appendChild(autoRenderScript);
+        };
+        katexScript.onerror = () => reject();
+        document.head.appendChild(katexScript);
+    });
+}
+
+// KaTeX rendering configuration
+const katexConfig = {
+    delimiters: [
+        { left: "$$", right: "$$", display: true }, // Block math
+        { left: "$", right: "$", display: false }, // Inline math
+        { left: "\\(", right: "\\)", display: false }, // Inline math
+        { left: "\\[", right: "\\]", display: true }, // Block math
+    ],
+    throwOnError: false,
+    errorColor: "#cc0000",
+};
+
+// Function to render math expressions
+function renderMath(element = document.body) {
+    //@ts-ignore
+    if (window.renderMathInElement) {
+        //@ts-ignore
+        renderMathInElement(element, katexConfig);
+    }
+}
+
 function startPhraseRotation() {
     if (isUserAction) return;
 
@@ -593,6 +632,7 @@ function displayQuiz(quiz) {
     if (generatorCard instanceof HTMLElement) generatorCard.style.display = "none";
     if (quizCard instanceof HTMLElement) quizCard.style.display = "block";
     if (quizContainer instanceof HTMLElement) quizContainer.style.display = "block";
+    renderMath();
 }
 
 const quizForm = document.getElementById("quizForm");
@@ -891,6 +931,7 @@ function displayResults(results) {
     if (quizCard) quizCard.style.display = "none";
     if (resultsCardFinal) resultsCardFinal.style.display = "block";
     if (resultsFinal) resultsFinal.style.display = "block";
+    renderMath();
 }
 /**
  *
@@ -934,7 +975,15 @@ function showWarning(message) {
 }
 
 // Start the phrase rotation when page loads
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    try {
+        await loadKaTeX();
+        console.log("KaTeX loaded successfully");
+        renderMath(); // Initial render
+    } catch (error) {
+        console.error("Failed to load KaTeX:", error);
+    }
+
     startPhraseRotation();
     initializeModernDropdown();
 });

@@ -1161,6 +1161,22 @@ body {
     box-shadow: 0 4px 20px rgba(255, 165, 0, 0.3);
 }
 
+/* Dynamic Results Header Colors Based on Performance */
+.results-header.performance-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.results-header.performance-warning {
+    background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
+    box-shadow: 0 4px 20px rgba(255, 165, 0, 0.3);
+}
+
+.results-header.performance-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
 .results-header::before {
     content: '';
     position: absolute;
@@ -1200,6 +1216,22 @@ body {
     text-align: center;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Performance-based stat card styling */
+.results-header.performance-success .stat-card {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.results-header.performance-warning .stat-card {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.results-header.performance-info .stat-card {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .stat-value {

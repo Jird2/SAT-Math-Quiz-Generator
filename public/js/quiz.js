@@ -703,6 +703,20 @@ function displayResults(results) {
         contentArea.style.flex = "1";
     }
     const percentage = results.percentage;
+    
+    // Determine performance level for dynamic coloring
+    let performanceClass = "";
+    let performanceMessage = "";
+    if (percentage >= 80) {
+        performanceClass = "performance-success";
+        performanceMessage = "Excellent Performance!";
+    } else if (percentage >= 60) {
+        performanceClass = "performance-warning";
+        performanceMessage = "Good Progress!";
+    } else {
+        performanceClass = "performance-info";
+        performanceMessage = "Keep Learning!";
+    }
     if (percentage >= 80) {
         updateMascotMessage("Outstanding work! You're SAT ready!", true);
     } else if (percentage >= 60) {
@@ -799,12 +813,12 @@ function displayResults(results) {
             <div class="results" id="results">
                 <div class="results-main-wrapper">
                     <div class="results-content-area">
-                        <div class="results-header">
+                        <div class="results-header ${performanceClass}">
                             <h2>Quiz Results</h2>
                             <div class="score-display">
                                 ${results.score}/${results.total}
                             </div>
-                            <p class="score-subtitle">Your Performance Analysis</p>
+                            <p class="score-subtitle">${performanceMessage}</p>
                             <div class="stats-grid">
                                 <div class="stat-card">
                                     <div class="stat-value">${results.score}</div>

@@ -9,5 +9,8 @@
     "mathjs": "^14.5.2",
     "openai": "^5.8.3",
     "unicode-symbols": "^7.6.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.11"
   }
 }

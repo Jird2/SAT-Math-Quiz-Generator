@@ -22,7 +22,65 @@ let currentQuiz = null;
  * @type {string[]}
  */
 let selectedMathClasses = [];
-const idlePhrases = ["Ready to ace your SAT Math? Let's get started!", "Math is like a puzzle, let's solve it together!", "Practice makes perfect! You've got this!", "Don't give up!", "Let's turn those math challenges into victories!", "Let's be better than yesterday!"];
+const idlePhrases = [
+    // Quadratic Formula & Algebra
+    "Quadratic formula: $x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$",
+    "Perfect squares: $(a±b)^2 = a^2 ± 2ab + b^2$",
+    "Difference of squares: $a^2 - b^2 = (a+b)(a-b)$",
+    "Slope formula: $m = \\frac{y_2-y_1}{x_2-x_1}$",
+
+    // Geometry & Area Formulas
+    "Circle area: $A = \\pi r^2$, Circumference: $C = 2\\pi r$",
+    "Triangle area: $A = \\frac{1}{2}bh$ or $A = \\frac{1}{2}ab\\sin C$",
+    "Pythagorean theorem: $a^2 + b^2 = c^2$",
+    "30-60-90 triangle sides: $x : x\\sqrt{3} : 2x$",
+    "45-45-90 triangle sides: $x : x : x\\sqrt{2}$",
+
+    // Trigonometry
+    "SOH-CAH-TOA: $\\sin = \\frac{opp}{hyp}$, $\\cos = \\frac{adj}{hyp}$, $\\tan = \\frac{opp}{adj}$",
+    "Pythagorean identity: $\\sin^2\\theta + \\cos^2\\theta = 1$",
+    "Unit circle: $(\\cos\\theta, \\sin\\theta)$ at angle $\\theta$",
+
+    // Exponents & Logarithms
+    "Exponent rules: $a^m \\cdot a^n = a^{m+n}$, $(a^m)^n = a^{mn}$",
+    "Logarithm properties: $\\log(ab) = \\log a + \\log b$",
+    "$\\log_a(a^x) = x$ and $a^{\\log_a x} = x$",
+
+    // Statistics & Probability
+    "Mean = $\\frac{\\text{sum of values}}{\\text{number of values}}$",
+    "Standard deviation measures spread from the mean",
+    "Probability: $P(A) = \\frac{\\text{favorable outcomes}}{\\text{total outcomes}}$",
+
+    // Problem-Solving Tips
+    "When stuck, try plugging in answer choices (backsolving)!",
+    "Draw diagrams for geometry problems - visualize the solution",
+    "Check units in word problems - they guide your setup",
+    "Estimate first, then calculate for reasonableness checks",
+    "Factor before using the quadratic formula - might be easier!",
+
+    // Logic & Strategy
+    "If two triangles share angles, they're similar (AA similarity)",
+    "Perpendicular lines have slopes that multiply to -1",
+    "Zero product property: If $ab = 0$, then $a = 0$ or $b = 0$",
+    "Distance formula: $d = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$",
+
+    // Function & Graph Facts
+    "Vertex form: $f(x) = a(x-h)^2 + k$ has vertex at $(h,k)$",
+    "Horizontal line test determines if a function has an inverse",
+    "Domain restrictions often come from denominators and square roots",
+    "Even functions: $f(-x) = f(x)$, Odd functions: $f(-x) = -f(x)$",
+
+    // Special Numbers & Constants
+    "$\\pi \\approx 3.14159$, $e \\approx 2.718$, $\\sqrt{2} \\approx 1.414$",
+    "Sum of angles in any triangle always equals $180°$",
+
+    // Advanced Tips
+    "Synthetic division is faster than long division for polynomials",
+    "Completing the square: $x^2 + bx + (\\frac{b}{2})^2$",
+    "Law of cosines: $c^2 = a^2 + b^2 - 2ab\\cos C$",
+    "Arithmetic sequence: $a_n = a_1 + (n-1)d$",
+    "Geometric sequence: $a_n = a_1 \\cdot r^{n-1}$",
+];
 
 let currentPhraseIndex = 0;
 /**
@@ -30,21 +88,63 @@ let currentPhraseIndex = 0;
  */
 let phraseInterval;
 let isUserAction = false;
+let isDragging = false;
+let dragOffset = { x: 0, y: 0 };
+let speechVisible = true;
+let isMinimized = false;
+let isPausedByUser = false;
+let isAutoRotating = true;
 
 function loadKaTeX() {
     return new Promise((resolve, reject) => {
-        // Load main KaTeX script
+        // Check if KaTeX is already loaded
+        //@ts-ignore
+        if (window.katex && window.renderMathInElement) {
+            console.log("KaTeX already loaded");
+            resolve(undefined);
+            return;
+        }
+
+        console.log("Loading KaTeX from CDN...");
+
+        // Load KaTeX CSS from CDN
+        const katexCSS = document.createElement("link");
+        katexCSS.rel = "stylesheet";
+        katexCSS.href = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css";
+        katexCSS.onload = () => console.log("KaTeX CSS loaded from CDN");
+        katexCSS.onerror = () => console.error("Failed to load KaTeX CSS from CDN");
+        document.head.appendChild(katexCSS);
+        // Load main KaTeX script from CDN
         const katexScript = document.createElement("script");
-        katexScript.src = "/public/katex/katex.min.js";
+        katexScript.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js";
         katexScript.onload = () => {
-            // Load auto-render extension
+            console.log("KaTeX main script loaded from CDN");
+            // Load auto-render extension from CDN
             const autoRenderScript = document.createElement("script");
-            autoRenderScript.src = "/public/katex/contrib/auto-render.min.js";
-            autoRenderScript.onload = () => resolve(undefined);
-            autoRenderScript.onerror = () => reject();
+            autoRenderScript.src = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js";
+            autoRenderScript.onload = () => {
+                console.log("KaTeX auto-render loaded from CDN");
+
+                // Double-check that everything is available
+                //@ts-ignore
+                if (window.renderMathInElement) {
+                    console.log("KaTeX fully loaded and ready!");
+                    setTimeout(() => resolve(undefined), 100);
+                } else {
+                    console.error("KaTeX loaded but renderMathInElement not available");
+                    reject(new Error("renderMathInElement not available"));
+                }
+            };
+            autoRenderScript.onerror = (error) => {
+                console.error("Failed to load auto-render from CDN:", error);
+                reject(error);
+            };
             document.head.appendChild(autoRenderScript);
         };
-        katexScript.onerror = () => reject();
+        katexScript.onerror = (error) => {
+            console.error("Failed to load KaTeX main script from CDN:", error);
+            reject(error);
+        };
         document.head.appendChild(katexScript);
     });
 }
@@ -63,15 +163,40 @@ const katexConfig = {
 
 // Function to render math expressions
 function renderMath(element = document.body) {
+    console.log("Attempting to render math...");
     //@ts-ignore
-    if (window.renderMathInElement) {
+    if (!window.renderMathInElement) {
+        console.error("renderMathInElement not found");
+        return;
+    }
+    try {
         //@ts-ignore
-        renderMathInElement(element, katexConfig);
+        window.renderMathInElement(element, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true },
+            ],
+            throwOnError: false,
+            errorColor: "#cc0000",
+            // Add these options for better compatibility
+            fleqn: false,
+            macros: {},
+            colorIsTextColor: false,
+            maxSize: Infinity,
+            maxExpand: 1000,
+            strict: "warn",
+            trust: false,
+        });
+        console.log("Math rendering completed");
+    } catch (error) {
+        console.error("Error rendering math:", error);
     }
 }
 
 function startPhraseRotation() {
-    if (isUserAction) return;
+    if (isUserAction || !isAutoRotating) return;
 
     phraseInterval = setInterval(() => {
         if (!isUserAction) {
@@ -81,6 +206,14 @@ function startPhraseRotation() {
     }, 10000);
 }
 
+function resetToAutoMode() {
+    isAutoRotating = true;
+    stopPhraseRotation();
+    updateMascotMessage("Ready to ace your SAT Math? Let's go!");
+    setTimeout(() => {
+        startPhraseRotation();
+    }, 3000);
+}
 function stopPhraseRotation() {
     /**
      * @param {number} phraseInterval
@@ -99,18 +232,171 @@ function updateMascotMessage(message, isAction = false) {
     const speechBubble = document.getElementById("mascotSpeech");
     if (speechBubble) {
         speechBubble.textContent = message;
+        speechBubble.classList.remove("hidden");
+        speechVisible = true;
+        setTimeout(() => {
+            renderMath(speechBubble);
+        }, 50);
     }
 
     isUserAction = isAction;
 
     if (isAction) {
         stopPhraseRotation();
+
+        // Add attention animation to widget
+        const widget = document.getElementById("brainyWidget");
+        if (widget) {
+            widget.classList.add("attention");
+        }
+
         setTimeout(() => {
             isUserAction = false;
             startPhraseRotation();
+            if (widget) {
+                widget.classList.remove("attention");
+            }
         }, 5000);
     }
 }
+
+function showNextFact() {
+    currentPhraseIndex = (currentPhraseIndex + 1) % idlePhrases.length;
+    const currentFact = idlePhrases[currentPhraseIndex];
+    updateMascotMessage(currentFact, true);
+}
+
+function toggleSpeechRotation() {
+    stopPhraseRotation();
+    isAutoRotating = false;
+    showNextFact();
+}
+
+function initializeWidget() {
+    const widget = document.getElementById("brainyWidget");
+    const speech = document.getElementById("mascotSpeech");
+    const mascot = document.getElementById("widgetMascot");
+    const toggleSpeechBtn = document.getElementById("toggleSpeechBtn");
+    const minimizeBtn = document.getElementById("minimizeBtn");
+    if (!widget) return;
+
+    widget.addEventListener("mousedown", startDrag);
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", endDrag);
+
+    if (toggleSpeechBtn) {
+        toggleSpeechBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleSpeech();
+        });
+    }
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            minimizeWidget();
+        });
+    }
+    if (mascot) {
+        mascot.addEventListener("click", (e) => {
+            if (!isDragging) {
+                e.stopPropagation();
+                toggleSpeechRotation();
+            }
+        });
+    }
+    /**
+     * @type any
+     */
+    let speechTimeout;
+    function autoHideSpeech() {
+        clearTimeout(speechTimeout);
+        speechTimeout = setTimeout(() => {
+            if (speechVisible && !isMinimized && speech) {
+                speech.classList.add("hidden");
+            }
+        }, 8000);
+    }
+
+    widget.addEventListener("mouseenter", () => {
+        clearTimeout(speechTimeout);
+        if (speechVisible && !isMinimized && speech) {
+            speech.classList.remove("hidden");
+        }
+    });
+
+    widget.addEventListener("mouseleave", () => {
+        autoHideSpeech();
+    });
+
+    autoHideSpeech();
+}
+
+function startDrag(/** @type {any} */ e) {
+    if (e.target.classList.contains("control-btn")) return;
+
+    const widget = document.getElementById("brainyWidget");
+    if (!widget) return;
+
+    isDragging = true;
+    widget.classList.add("dragging");
+
+    const rect = widget.getBoundingClientRect();
+    dragOffset.x = e.clientX - rect.left;
+    dragOffset.y = e.clientY - rect.top;
+
+    e.preventDefault();
+}
+
+function drag(/** @type {any} */ e) {
+    if (!isDragging) return;
+
+    const widget = document.getElementById("brainyWidget");
+    if (!widget) return;
+
+    const x = e.clientX - dragOffset.x;
+    const y = e.clientY - dragOffset.y;
+
+    const maxX = window.innerWidth - widget.offsetWidth;
+    const maxY = window.innerHeight - widget.offsetHeight;
+
+    const constrainedX = Math.max(0, Math.min(x, maxX));
+    const constrainedY = Math.max(0, Math.min(y, maxY));
+
+    widget.style.left = constrainedX + "px";
+    widget.style.top = constrainedY + "px";
+    widget.style.right = "auto";
+    widget.style.bottom = "auto";
+}
+
+function endDrag() {
+    isDragging = false;
+    const widget = document.getElementById("brainyWidget");
+    if (widget) {
+        widget.classList.remove("dragging");
+    }
+}
+
+function toggleSpeech() {
+    speechVisible = !speechVisible;
+    const speech = document.getElementById("mascotSpeech");
+    if (speech) {
+        speech.classList.toggle("hidden", !speechVisible);
+    }
+}
+
+function minimizeWidget() {
+    isMinimized = !isMinimized;
+    const widget = document.getElementById("brainyWidget");
+    const speech = document.getElementById("mascotSpeech");
+
+    if (widget) {
+        widget.classList.toggle("minimized", isMinimized);
+    }
+    if (speech) {
+        speech.classList.toggle("hidden", isMinimized);
+    }
+}
+
 function initializeModernDropdown() {
     const dropdownSelected = document.getElementById("dropdownSelected");
     const dropdownList = document.getElementById("dropdownList");
@@ -218,39 +504,51 @@ document.addEventListener("keydown", function (e) {
             questions: [
                 {
                     id: 1,
-                    question: "Solve for x: x² - 5x + 6 = 0",
+                    question: "Solve for x: $x^2 - 5x + 6 = 0$",
                     options: {
-                        A: "x = 2, x = 3",
-                        B: "x = 1, x = 6",
-                        C: "x = -2, x = -3",
-                        D: "x = 0, x = 5",
+                        A: "$x = 2, x = 3$",
+                        B: "$x = 1, x = 6$",
+                        C: "$x = -2, x = -3$",
+                        D: "$x = 0, x = 5$",
                     },
                     correctAnswer: "A",
-                    explanation: "Factor the quadratic equation to (x - 2)(x - 3) = 0, leading to x = 2 or x = 3.",
+                    explanation: "Factor the quadratic equation to $(x - 2)(x - 3) = 0$, leading to $x = 2$ or $x = 3$.",
                 },
                 {
                     id: 2,
-                    question: "If sin θ = 3/5 and θ is in the second quadrant, what is cos θ?",
+                    question: "If $\\sin \\theta = \\frac{3}{5}$ and $\\theta$ is in the second quadrant, what is $\\cos \\theta$?",
                     options: {
-                        A: "4/5",
-                        B: "-4/5",
-                        C: "3/4",
-                        D: "-3/4",
+                        A: "$\\frac{4}{5}$",
+                        B: "$-\\frac{4}{5}$",
+                        C: "$\\frac{3}{4}$",
+                        D: "$-\\frac{3}{4}$",
                     },
                     correctAnswer: "B",
-                    explanation: "Use the Pythagorean identity: sin²θ + cos²θ = 1. Since θ is in the second quadrant, cosine is negative. Therefore, cos θ = -4/5.",
+                    explanation: "Use the Pythagorean identity: $\\sin^2\\theta + \\cos^2\\theta = 1$. Since $\\theta$ is in the second quadrant, cosine is negative. Therefore, $\\cos \\theta = -\\frac{4}{5}$.",
                 },
                 {
                     id: 3,
-                    question: "Simplify: log₃(27) + log₃(9)",
+                    question: "Simplify: $\\log_3(27) + \\log_3(9)$",
                     options: {
-                        A: "5",
-                        B: "4",
-                        C: "6",
-                        D: "3",
+                        A: "$5$",
+                        B: "$4$",
+                        C: "$6$",
+                        D: "$3$",
                     },
                     correctAnswer: "A",
-                    explanation: "log₃(27) = 3 and log₃(9) = 2, so the sum is 3 + 2 = 5.",
+                    explanation: "$\\log_3(27) = 3$ and $\\log_3(9) = 2$, so the sum is $3 + 2 = 5$.",
+                },
+                {
+                    id: 4,
+                    question: "Given matrix $A = \\begin{bmatrix} 3 & 1 \\\\ 2 & 4 \\end{bmatrix}$, what is the value of the element in row 2, column 1?",
+                    options: {
+                        A: "$2$",
+                        B: "$3$",
+                        C: "$4$",
+                        D: "$1$",
+                    },
+                    correctAnswer: "A",
+                    explanation: "In matrix $A$, the element in row 2, column 1 is $2$.",
                 },
             ],
         };
@@ -266,21 +564,28 @@ document.addEventListener("keydown", function (e) {
                     correct: true,
                     studentAnswer: "A",
                     correctAnswer: "A",
-                    explanation: "Factor the quadratic equation to (x - 2)(x - 3) = 0, leading to x = 2 or x = 3.",
+                    explanation: "Factor the quadratic equation to $(x - 2)(x - 3) = 0$, leading to $x = 2$ or $x = 3$.",
                 },
                 {
                     questionId: 2,
                     correct: false,
                     studentAnswer: "A",
                     correctAnswer: "B",
-                    explanation: "Use the Pythagorean identity: sin²θ + cos²θ = 1. Since θ is in the second quadrant, cosine is negative. Therefore, cos θ = -4/5.",
+                    explanation: "Use the Pythagorean identity: $\\sin^2\\theta + \\cos^2\\theta = 1$. Since $\\theta$ is in the second quadrant, cosine is negative. Therefore, $\\cos \\theta = -\\frac{4}{5}$.",
                 },
                 {
                     questionId: 3,
                     correct: true,
                     studentAnswer: "A",
                     correctAnswer: "A",
-                    explanation: "log₃(27) = 3 and log₃(9) = 2, so the sum is 3 + 2 = 5.",
+                    explanation: "$\\log_3(27) = 3$ and $\\log_3(9) = 2$, so the sum is $3 + 2 = 5$.",
+                },
+                {
+                    questionId: 4,
+                    correct: false,
+                    studentAnswer: "B",
+                    correctAnswer: "A",
+                    explanation: "In matrix $A$, the element in row 2, column 1 is $2$.",
                 },
             ],
         };
@@ -572,18 +877,8 @@ function displayQuiz(quiz) {
     const quizInfo = document.getElementById("quizInfo");
     const questionsContainer = document.getElementById("questionsContainer");
 
-    // Hide mascot area for quiz page
-    const mascotArea = document.querySelector(".mascot-area");
-    if (mascotArea instanceof HTMLElement) {
-        mascotArea.style.display = "none";
-    }
-
-    const contentArea = document.querySelector(".content-area");
-    if (contentArea instanceof HTMLElement) {
-        contentArea.style.flex = "1";
-    }
     updateMascotMessage("", true);
-    // Populate quiz info
+
     if (quizInfo) {
         quizInfo.innerHTML = `
             <div class="quiz-info-item">${quiz.selectedClasses.join(", ")}</div>
@@ -591,40 +886,31 @@ function displayQuiz(quiz) {
             <div class="quiz-info-item">${quiz.questions.length} Questions</div>
         `;
     }
+
     if (questionsContainer) {
         questionsContainer.innerHTML = quiz.questions
             .map(
-                /** @param {any} question @param {number} index */ (question, index) => `
-            <div class="question ${index === 0 ? "question-with-mascot" : ""}">
-                ${
-                    index === 0
-                        ? `
-                    <div class="question-mascot">
-                        <img src="/public/assets/Brainy.svg" alt="Brainy Mascot" class="brainy-mascot">
+                /** @param {QuizQuestion} question @param {number} index */ (question, index) => `
+        <div class="question">
+            <h3>Question ${question.id || index + 1}: ${question.question}</h3>
+            <div class="options">
+                ${Object.entries(question.options)
+                    .map(
+                        ([key, value]) => `
+                    <div class="option">
+                        <input type="radio" id="q${index}_${key}" name="question_${index}" value="${key}">
+                        <label for="q${index}_${key}">${key}. ${value}</label>
                     </div>
                 `
-                        : ""
-                }
-                <div class="question-content-wrapper">
-                    <h3>Question ${question.id || index + 1}: ${question.question}</h3>
-                    <div class="options">
-                        ${Object.entries(question.options)
-                            .map(
-                                /** @param {[string, string]} entry */ ([key, value]) => `
-                            <div class="option">
-                                <input type="radio" id="q${index}_${key}" name="question_${index}" value="${key}">
-                                <label for="q${index}_${key}">${key}. ${value}</label>
-                            </div>
-                        `
-                            )
-                            .join("")}
-                    </div>
-                </div>
+                    )
+                    .join("")}
             </div>
-        `
+        </div>
+    `
             )
             .join("");
     }
+
     const generatorCard = document.getElementById("generatorCard");
     const quizCard = document.getElementById("quizCard");
     const quizContainer = document.getElementById("quizContainer");
@@ -632,7 +918,12 @@ function displayQuiz(quiz) {
     if (generatorCard instanceof HTMLElement) generatorCard.style.display = "none";
     if (quizCard instanceof HTMLElement) quizCard.style.display = "block";
     if (quizContainer instanceof HTMLElement) quizContainer.style.display = "block";
-    renderMath();
+
+    // Wait for DOM to update, then render math
+    setTimeout(() => {
+        //@ts-ignore
+        renderMath(questionsContainer);
+    }, 100);
 }
 
 const quizForm = document.getElementById("quizForm");
@@ -685,7 +976,7 @@ if (quizForm instanceof HTMLFormElement) {
         } catch (error) {
             console.error("Error grading quiz:", error);
             alert("Error grading quiz. Please try again.");
-            updateMascotMessage("Hmm, trouble grading. Let's try that again! 🔄", true);
+            updateMascotMessage("Hmm, trouble grading. Let's try that again!", true);
         }
     });
 }
@@ -702,13 +993,18 @@ function displayResults(results) {
     if (contentArea instanceof HTMLElement) {
         contentArea.style.flex = "1";
     }
+    let performanceClass = "";
+    let performanceMessage = "";
     const percentage = results.percentage;
     if (percentage >= 80) {
-        updateMascotMessage("Outstanding work! You're SAT ready!", true);
+        performanceClass = "performance-success";
+        performanceMessage = "Excellent!";
     } else if (percentage >= 60) {
-        updateMascotMessage("Good job! Keep practicing!", true);
+        performanceClass = "performance-warning";
+        performanceMessage = "You're getting there, c'mon!";
     } else {
-        updateMascotMessage("Don't give up! Practice makes perfect!", true);
+        performanceClass = "performance-info";
+        performanceMessage = "Keep on learning! Practice makes perfect!";
     }
     const resultsContent = results.results
         .map(
@@ -717,21 +1013,11 @@ function displayResults(results) {
                 const question = currentQuiz.questions[index];
                 const isCorrect = result.correct;
                 const statusClass = isCorrect ? "correct" : "incorrect";
-                const statusIcon = isCorrect ? "✅" : "❌";
+                const statusIcon = isCorrect ? "<i class='bi bi-check-lg'></i>" : "<i class='bi bi-x-lg'></i>";
                 const showCorrectAnswer = !isCorrect;
 
                 return `
-            <div class="question-result ${statusClass} ${index === 0 ? "question-result-with-mascot" : ""}">
-                ${
-                    index === 0
-                        ? `
-                    <div class="result-mascot">
-                        <img src="/public/assets/Brainy.svg" alt="Brainy Mascot" class="brainy-mascot">
-                    </div>
-                `
-                        : ""
-                }
-                
+    <div class="question-result ${statusClass}">
                 <div class="result-content-wrapper">
                     <div class="question-header">
                         <div class="status-icon ${statusClass}">
@@ -739,43 +1025,54 @@ function displayResults(results) {
                         </div>
                         <div class="question-content">
                             <div class="question-title">
-                                <strong>Question ${question.id}:</strong> ${question.question}
+                                <strong>${question.id}.</strong> ${question.question}
                             </div>
                         </div>
                     </div>
 
                     <div class="answer-comparison">
-                        <!-- Student Answer -->
-                        <div class="answer-item student-answer ${isCorrect ? "correct" : "incorrect"}">
-                            <div class="answer-icon ${isCorrect ? "correct" : "incorrect"}">
-                                ${isCorrect ? "✓" : "✗"}
-                            </div>
-                            <div>
-                                <div class="answer-label">Your Answer</div>
-                                <div class="answer-text">
-                                    <strong>${result.studentAnswer || "No answer selected"}</strong>
-                                    ${result.studentAnswer ? ` - ${question.options[result.studentAnswer] || "Invalid option"}` : ""}
-                                </div>
-                            </div>
-                        </div>
+    ${["A", "B", "C", "D"]
+        .map((letter) => {
+            const optionText = question.options[letter];
+            if (!optionText) return ""; // Skip if option doesn't exist
 
-                        <!-- Correct Answer (only show if student was wrong) -->
-                        ${
-                            showCorrectAnswer
-                                ? `
-                            <div class="answer-item correct-answer">
-                                <div class="answer-icon correct">✓</div>
-                                <div>
-                                    <div class="answer-label">Correct Answer</div>
-                                    <div class="answer-text">
-                                        <strong>${result.correctAnswer}</strong> - ${question.options[result.correctAnswer]}
-                                    </div>
-                                </div>
-                            </div>
-                        `
-                                : ""
-                        }
-                    </div>
+            const isUserAnswer = result.studentAnswer === letter;
+            const isCorrectAnswer = result.correctAnswer === letter;
+
+            let answerClass = "answer-item";
+            let iconSymbol = letter;
+            let labelText = `${letter}`;
+
+            if (isCorrectAnswer) {
+                answerClass += " correct-answer";
+                iconSymbol = "✓";
+                labelText = "Correct Answer";
+            }
+
+            if (isUserAnswer && !isCorrectAnswer) {
+                answerClass += " student-answer incorrect";
+                iconSymbol = "✗";
+                labelText = "Your Answer";
+            }
+
+            if (isUserAnswer && isCorrectAnswer) {
+                answerClass += " student-answer correct";
+                iconSymbol = "✓";
+                labelText = "Your Answer";
+            }
+
+            return `
+            <div class="${answerClass}">
+                <div class="answer-icon ${isCorrectAnswer ? "correct" : isUserAnswer ? "incorrect" : ""}">${iconSymbol}</div>
+                <div class="answer-text">
+                    <div class="answer-label"></div>
+                    ${letter}: ${optionText}
+                </div>
+            </div>
+        `;
+        })
+        .join("")}
+</div>
 
                     <!-- Explanation -->
                     <div class="explanation-section">
@@ -799,12 +1096,12 @@ function displayResults(results) {
             <div class="results" id="results">
                 <div class="results-main-wrapper">
                     <div class="results-content-area">
-                        <div class="results-header">
+                        <div class="results-header ${performanceClass}">
                             <h2>Quiz Results</h2>
                             <div class="score-display">
                                 ${results.score}/${results.total}
                             </div>
-                            <p class="score-subtitle">Your Performance Analysis</p>
+                            <p class="score-subtitle">${performanceMessage}</p>
                             <div class="stats-grid">
                                 <div class="stat-card">
                                     <div class="stat-value">${results.score}</div>
@@ -839,16 +1136,6 @@ function displayResults(results) {
         const backBtn = document.getElementById("backBtn");
         if (backBtn) {
             backBtn.addEventListener("click", function () {
-                const mascotArea = document.querySelector(".mascot-area");
-                if (mascotArea instanceof HTMLElement) {
-                    mascotArea.style.display = "flex";
-                }
-
-                // Restore content area width
-                const contentArea = document.querySelector(".content-area");
-                if (contentArea instanceof HTMLElement) {
-                    contentArea.style.flex = "2";
-                }
                 const resultsCard = document.getElementById("resultsCard");
                 const generatorCard = document.getElementById("generatorCard");
                 if (resultsCard) resultsCard.style.display = "none";
@@ -931,7 +1218,57 @@ function displayResults(results) {
     if (quizCard) quizCard.style.display = "none";
     if (resultsCardFinal) resultsCardFinal.style.display = "block";
     if (resultsFinal) resultsFinal.style.display = "block";
-    renderMath();
+    setTimeout(() => {
+        console.log("Rendering math on results page...");
+        const resultsContainer = document.getElementById("resultsContainer");
+        if (resultsContainer) {
+            renderMath(resultsContainer);
+        } else {
+            renderMath(); // Fallback to entire document
+        }
+    }, 200);
+}
+
+/**
+ * @typedef {Object} QuestionOption
+ * @property {HTMLInputElement} input
+ * @property {HTMLElement} option
+ * @property {string} optionValue
+ */
+
+/**
+ * @param {number} questionIndex
+ * @param {string} selectedAnswer
+ */
+function revealAnswers(questionIndex, selectedAnswer) {
+    if (!currentQuiz) return;
+
+    const question = currentQuiz.questions[questionIndex];
+    const correctAnswer = question.correctAnswer || question.correctAnswer;
+
+    // Get all options for this question
+    const options = document.querySelectorAll(`input[name="question_${questionIndex}"]`).forEach(
+        /** @param {Element} input */ (input) => {
+            if (!(input instanceof HTMLInputElement)) return;
+
+            const option = input.closest(".option");
+            if (!(option instanceof HTMLElement)) return;
+
+            const optionValue = input.value;
+
+            // Mark correct answer
+            if (optionValue === correctAnswer) {
+                option.classList.add("correct");
+            }
+            // Mark user's incorrect answer
+            else if (optionValue === selectedAnswer && selectedAnswer !== correctAnswer) {
+                option.classList.add("incorrect");
+            }
+
+            // Disable further clicks
+            option.classList.add("disabled");
+        }
+    );
 }
 /**
  *
@@ -983,7 +1320,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     } catch (error) {
         console.error("Failed to load KaTeX:", error);
     }
-
+    isAutoRotating = true;
     startPhraseRotation();
     initializeModernDropdown();
+    initializeWidget();
 });

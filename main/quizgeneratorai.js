@@ -61,7 +61,6 @@ export async function generateQuiz(selectedClasses = [], numquestions = 0, diffi
             const systemPrompt = createSystemPrompt(difficulty);
             console.log("System prompt length:", systemPrompt.length);
             console.log("Cached rules length:", CACHED_FORMATTING_RULES.length);
-            //region API Prompt Caching
             const response = await anthropic.messages.create({
                 model: "claude-opus-4-20250514",
                 max_tokens: 8000,

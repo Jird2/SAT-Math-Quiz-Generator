@@ -555,9 +555,9 @@ document.addEventListener("keydown", function (e) {
 
         // Mock results with some correct and incorrect answers (Demo purposes)
         const mockResults = {
-            score: 2,
+            score: 3,
             total: 3,
-            percentage: 67,
+            percentage: 100,
             results: [
                 {
                     questionId: 1,

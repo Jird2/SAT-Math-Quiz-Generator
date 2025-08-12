@@ -7,7 +7,7 @@ import { generateQuiz } from "./quizgeneratorai.js";
 import { gradeQuiz } from "./quizGrader.js";
 import { formatWithKaTeX } from "./mathFormatting.js";
 const app = express();
-const port = 3000; // Pull this into the .env instead of hardcoding
+const port = 3000;
 // Edgecases for port resolution
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

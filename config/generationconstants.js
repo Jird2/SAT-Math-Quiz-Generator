@@ -3,11 +3,15 @@
  * @typedef {"easy" | "medium" | "hard"} Difficulty
  */
 export const mathClasses = {
-    "Algebra I": ["Linear Equations", "Polynomials", "Factoring", "Systems of Equations", "Inequalities"],
-    Geometry: ["Area and Perimeter", "Triangles", "Circles", "Volume", "Coordinate Geometry"],
-    "Algebra II": ["Quadratic Functions", "Exponential Functions", "Logarithms", "Rational Functions", "Complex Numbers"],
-    Trigonometry: ["Trigonometric Functions", "Unit Circle", "Identities", "Law of Sines", "Law of Cosines"],
-    "Pre-Calculus": ["Polynomial Functions", "Sequences and Series", "Conic Sections", "Matrices", "Limits"],
+    "Algebra I": ["One-step linear equations", "Two-step linear equations", "Multi-step linear equations", "Linear inequalities", "Compound inequalities", "Systems by substitution", "Systems by elimination", "Systems word problems", "Polynomial addition", "Polynomial multiplication", "Factoring trinomials", "Factoring by grouping", "Difference of squares", "Perfect square trinomials"],
+
+    Geometry: ["Area of triangles", "Area of quadrilaterals", "Area of circles", "Perimeter calculations", "Volume of prisms", "Volume of cylinders", "Pythagorean theorem", "Distance formula", "Midpoint formula", "Angle relationships", "Triangle congruence", "Similar triangles", "Circle theorems", "Arc length", "Sector area"],
+
+    "Algebra II": ["Quadratic vertex form", "Quadratic factoring", "Quadratic formula", "Exponential growth", "Exponential decay", "Exponential equations", "Logarithm properties", "Logarithmic equations", "Change of base", "Rational function graphs", "Rational equations", "Rational inequalities", "Complex number operations", "Complex conjugates", "Polynomial division"],
+
+    Trigonometry: ["Unit circle values", "Right triangle ratios", "Reference angles", "Law of Sines", "Law of Cosines", "Area using trigonometry", "Pythagorean identities", "Double angle formulas", "Sum/difference formulas", "Trigonometric equations", "Inverse trig functions", "Amplitude and period", "Phase shifts", "Trigonometric graphs", "Coterminal angles"],
+
+    "Pre-Calculus": ["Polynomial end behavior", "Polynomial roots", "Rational root theorem", "Arithmetic sequences", "Geometric sequences", "Series summation", "Matrix operations", "Matrix determinants", "Matrix inverses", "Parabolas", "Ellipses", "Hyperbolas", "Basic limits", "Limit laws", "Continuity"],
 };
 
 export const difficultyClassification = {

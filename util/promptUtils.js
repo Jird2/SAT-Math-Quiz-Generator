@@ -1,5 +1,5 @@
 // @ts-check
-import { difficultyClassification } from "../config/generationconstants.js";
+import { difficultyClassification, mathClasses } from "../config/generationconstants.js";
 /**
  * @typedef {"easy" | "medium" | "hard"} Difficulty
  */
@@ -113,6 +113,26 @@ export function generateQuestionDistribution(selectedClasses, totalQuestions) {
 
     return distribution.join("\n");
 }
+/**
+ * Get unique topics from selected classes
+ * @param {string[]} selectedClasses
+ * @param {number} numQuestions
+ */
+export function getUniqueTopics(selectedClasses, numQuestions) {
+    /**
+     * @type {string[]}
+     */
+    const allTopics = [];
+    selectedClasses.forEach((className) => {
+        const topics = mathClasses[/** @type {keyof typeof mathClasses} */ (className)] || [];
+        topics.forEach((topic) => {
+            allTopics.push(`${className}: ${topic}`);
+        });
+    });
+    // Shuffle and return unique topics
+    const shuffled = allTopics.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, numQuestions);
+}
 
 /**
  * Add generation ID and freshness instructions to prompt
@@ -151,12 +171,15 @@ Instruction: This is a completely FRESH quiz generation. Do NOT repeat any patte
 export function buildDynamicPrompt(selectedClasses, difficulty, questionsToGenerate) {
     const difficultyInstructions = generateDifficultyInstructions(selectedClasses, difficulty);
     const complexityGuidelines = generateComplexityGuidelines(difficulty);
-
+    const specificTopics = getUniqueTopics(selectedClasses, questionsToGenerate);
     const dynamicPrompt = `Generate a ${difficulty} SAT math quiz with ${questionsToGenerate} questions for students who have taken these math classes: ${selectedClasses.join(", ")}.
 
 ${difficultyInstructions}
 
 ${complexityGuidelines}
+
+**QUESTION TOPICS:**
+${specificTopics.map((topic, index) => `- Question ${index + 1}: Create a ${difficulty} question about ${topic}`).join("\n")}
 
 **QUESTION DISTRIBUTION REQUIREMENTS:**
 ${generateQuestionDistribution(selectedClasses, questionsToGenerate)}

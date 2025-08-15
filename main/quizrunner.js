@@ -7,13 +7,14 @@ import { generateQuiz } from "./quizgeneratorai.js";
 import { gradeQuiz } from "./quizGrader.js";
 import { formatWithKaTeX } from "./mathFormatting.js";
 const app = express();
-const port = 3000;
 // Edgecases for port resolution
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config();
 app.use(express.json()); // Parse JSON request bodies
 app.use("/public", express.static(path.join(__dirname, "..", "public")));
+
+const port = process.env.PORT || 3000;
 
 app.get("/", (_req, res) => {
     res.json({ message: "Quiz server is running!" });
